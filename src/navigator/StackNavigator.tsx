@@ -8,7 +8,7 @@ import { auth } from '../configs/firebaseConfig';
 import { View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { styles } from '../theme/styles';
-import { DetailMessageScreen } from '../screens/HomeScreen/DetailMessageScreen';
+import { DetailMessageScreen } from '../screens/HomeScreen/DetailPostsScreen';
 
 const Stack = createStackNavigator();
 

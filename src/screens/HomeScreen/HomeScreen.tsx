@@ -5,10 +5,10 @@ import { styles } from '../../theme/styles'
 import firebase, { signOut, updateProfile } from 'firebase/auth';
 import { auth, dbRealTime } from '../../configs/firebaseConfig';
 import { FlatList } from 'react-native-gesture-handler';
-import { MessageCardComponent } from './components/MessageCardComponent';
-import { NewMessageComponent } from './components/NewMessageComponent';
 import { onValue, ref } from 'firebase/database';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { PostsComponent } from './components/PostsComponent';
+import { NewPostsComponent } from './components/NewPostsComponent';
 
 
 //Interface - data usuario
@@ -17,7 +17,7 @@ interface FormUser {
 }
 
 //Interface - message
-export interface Message {
+export interface MessagePosts {
     id: string;
     to: string;
     subject: string;
@@ -49,7 +49,7 @@ export const HomeScreen = () => {
     const [showModalMessage, setShowModalMessage] = useState<boolean>(false);
 
     //hook useState: lista de mensajes
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<MessagePosts[]>([]);
 
     //hook navegación
     const navigation = useNavigation();
@@ -70,7 +70,7 @@ export const HomeScreen = () => {
     //Función para consultar la data desde firebase
     const getAllMessages = () => {
         //1. Referencia a la BDD - tabla
-        const dbRef = ref(dbRealTime, 'messages/' + auth.currentUser?.uid);
+        const dbRef = ref(dbRealTime, 'comentarios/' + auth.currentUser?.uid);
         //2. Consultar data
         onValue(dbRef, (snapshot) => {
             //3. Capturar data
@@ -80,7 +80,7 @@ export const HomeScreen = () => {
             //4. Obtener keys data
             const getKeys = Object.keys(data);
             //5. Crear un arreglo lista de mensajes
-            const listMessages: Message[] = [];
+            const listMessages: MessagePosts[] = [];
             getKeys.forEach((key) => {
                 const value = { ...data[key], id: key };
                 listMessages.push(value);
@@ -101,10 +101,9 @@ export const HomeScreen = () => {
         <>
             <View style={styles.rootHome}>
                 <View style={styles.header}>
-                    <Avatar.Text size={50} label="MI" />
+                    <Avatar.Text size={50} label="De" />
                     <View>
-                        <Text variant='bodySmall'>Bienvenida</Text>
-                        <Text variant='labelLarge'>{userAuth?.displayName}</Text>
+                        <Text variant='bodySmall'>Bienvenido</Text>
                     </View>
                     <View style={styles.iconEnd}>
                         <IconButton
@@ -118,7 +117,7 @@ export const HomeScreen = () => {
                 <View>
                     <FlatList
                         data={messages}
-                        renderItem={({ item }) => <MessageCardComponent message={item} />}
+                        renderItem={({ item }) => <PostsComponent message={item} />}
                         keyExtractor={item => item.id}
                     />
                 </View>
@@ -126,28 +125,9 @@ export const HomeScreen = () => {
             <Portal>
                 <Modal visible={showModal} contentContainerStyle={styles.modal}>
                     <View style={styles.header}>
-                        <Text variant='headlineMedium'>Mi Perfil</Text>
-                        <View style={styles.iconEnd}>
-                            <IconButton
-                                icon="close-circle-outline"
-                                size={28}
-                                onPress={() => setShowModal(false)}
-                            />
-                        </View>
+                        <Text variant='headlineMedium'>Salir</Text>
                     </View>
                     <Divider />
-                    <TextInput
-                        mode='outlined'
-                        label='Escribe tu nombre'
-                        value={formUser.name}
-                        onChangeText={(value) => handlerSetValues('name', value)}
-                    />
-                    <TextInput
-                        mode='outlined'
-                        label='Correo'
-                        value={userAuth?.email!}
-                        disabled />
-                    <Button mode='contained' onPress={handlerUpdateUser}>Actualizar</Button>
                     <View style={styles.iconSignOut}>
                         <IconButton
                             icon="logout"
@@ -163,7 +143,7 @@ export const HomeScreen = () => {
                 style={styles.fabMessage}
                 onPress={() => setShowModalMessage(true)}
             />
-            <NewMessageComponent showModalMessage={showModalMessage} setShowModalMessage={setShowModalMessage} />
+            <NewPostsComponent showModalMessage={showModalMessage} setShowModalMessage={setShowModalMessage} />
         </>
     )
 }

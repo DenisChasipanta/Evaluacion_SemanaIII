@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import { Button, Divider, Text, TextInput } from 'react-native-paper'
 import { styles } from '../../theme/styles'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Message } from './HomeScreen'
+import { MessagePosts } from './HomeScreen';
 import { ref, remove, update } from 'firebase/database'
 import { dbRealTime } from '../../configs/firebaseConfig'
 
@@ -18,7 +18,7 @@ export const DetailMessageScreen = () => {
     const navigation = useNavigation();
 
     //hook useState: manipulando el formulario Detailm Message
-    const [editFormMessage, setEditFormMessage] = useState<Message>({
+    const [editFormMessage, setEditFormMessage] = useState<MessagePosts>({
         id: '',
         to: '',
         subject: '',
@@ -55,16 +55,8 @@ export const DetailMessageScreen = () => {
 
     return (
         <View style={styles.rootDetail}>
-            <View>
-                <Text variant='headlineSmall'>Asunto: {editFormMessage.subject}</Text>
-                <Divider />
-            </View>
-            <View>
-                <Text variant='bodyLarge'>Para: {editFormMessage.to}</Text>
-                <Divider />
-            </View>
             <View style={{ gap: 20 }}>
-                <Text style={styles.textDetail}>Mensaje</Text>
+                <Text style={styles.textDetail}>Comentario</Text>
                 <TextInput
                     value={editFormMessage.message}
                     multiline={true}

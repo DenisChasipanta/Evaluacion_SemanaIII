@@ -1,4 +1,3 @@
-//rafc
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, Snackbar, Text, TextInput } from 'react-native-paper';
@@ -7,13 +6,14 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 
-//Interface - formRegister
+// Interface - formRegister
 interface FormRegister {
     email: string;
     password: string;
+    confirmPassword: string;
 }
 
-//Interface - mensajes
+// Interface - mensajes
 interface MessageSnackBar {
     visible: boolean;
     message: string;
@@ -21,34 +21,35 @@ interface MessageSnackBar {
 }
 
 export const RegisterScreen = () => {
-    //hook useState: manipulación del formulario
+    // Hook useState: manipulación del formulario
     const [formRegister, setFormRegister] = useState<FormRegister>({
         email: "",
-        password: ""
+        password: "",
+        confirmPassword: ""
     });
 
-    //hook useState: visualizar u ocultar mensaje 
+    // Hook useState: visualizar u ocultar mensaje 
     const [showMessage, setShowMessage] = useState<MessageSnackBar>({
         visible: false,
         message: '',
         color: '#fff'
     });
 
-    //hook useState: visualizar password
+    // Hook useState: visualizar password
     const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
 
-    //hook useNavigation: navegar entre screens
+    // Hook useNavigation: navegar entre screens
     const navigation = useNavigation();
 
-    //Función que cambie los valores del formRegister
+    // Función que cambie los valores del formRegister
     const handlerSetValues = (key: string, value: string) => {
         // operador spread: ... sacar una copia superficial de un objeto
         setFormRegister({ ...formRegister, [key]: value });
     }
 
-    //Función que permita crear y enviar el nuevo usuario
+    // Función que permita crear y enviar el nuevo usuario
     const handlerRegister = async () => {
-        if (!formRegister.email || !formRegister.password) {
+        if (!formRegister.email || !formRegister.password || !formRegister.confirmPassword) {
             setShowMessage({
                 visible: true,
                 message: 'Completa todos los campos!',
@@ -56,7 +57,16 @@ export const RegisterScreen = () => {
             });
             return;
         }
-        //console.log(formRegister)
+
+        if (formRegister.password !== formRegister.confirmPassword) {
+            setShowMessage({
+                visible: true,
+                message: 'Las contraseñas no coinciden!',
+                color: '#b53333'
+            });
+            return;
+        }
+
         // Código para registrar usuario
         try {
             const response = await createUserWithEmailAndPassword(
@@ -73,11 +83,12 @@ export const RegisterScreen = () => {
             console.log(ex);
             setShowMessage({
                 visible: true,
-                message: 'No se logró completar el registro, intente más tarde°',
+                message: 'No se logró completar el registro, intente más tarde.',
                 color: '#b53333'
             });
         }
     }
+
     return (
         <View style={styles.root}>
             <Text style={styles.textHead}>Regístrate</Text>
@@ -92,10 +103,17 @@ export const RegisterScreen = () => {
                 label='Contraseña'
                 placeholder='Escriba su contraseña'
                 secureTextEntry={hiddenPassword}
-                right={<TextInput.Icon icon="eye"
-                    onPress={() => setHiddenPassword(!hiddenPassword)} />}
+                right={<TextInput.Icon icon="eye" onPress={() => setHiddenPassword(!hiddenPassword)} />}
                 style={styles.inputs}
                 onChangeText={(value) => handlerSetValues('password', value)} />
+            <TextInput
+                mode='outlined'
+                label='Confirmar Contraseña'
+                placeholder='Confirme su contraseña'
+                secureTextEntry={hiddenPassword}
+                right={<TextInput.Icon icon="eye" onPress={() => setHiddenPassword(!hiddenPassword)} />}
+                style={styles.inputs}
+                onChangeText={(value) => handlerSetValues('confirmPassword', value)} />
             <Button style={styles.button} mode="contained" onPress={handlerRegister}>
                 Registrar
             </Button>

@@ -2,14 +2,14 @@ import React from 'react';
 import { View } from 'react-native';
 import { IconButton, Text } from 'react-native-paper';
 import { styles } from '../../../theme/styles';
-import { Message } from '../HomeScreen';
+import { MessagePosts } from '../HomeScreen';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 
 interface Props {
-    message: Message;
+    message: MessagePosts;
 }
 
-export const MessageCardComponent = ({ message }: Props) => {
+export const PostsComponent = ({ message }: Props) => {
 
     //hook navegación
     const navigation = useNavigation();
@@ -17,8 +17,8 @@ export const MessageCardComponent = ({ message }: Props) => {
     return (
         <View style={styles.rootMessage}>
             <View>
-                <Text variant='labelLarge'>Para: {message.to}</Text>
-                <Text variant='bodyMedium'>Asunto: {message.subject}</Text>
+                <Text variant='labelLarge'>Comentario: {message.to}</Text>
+                <Text variant='bodyMedium'>Email: {message.subject}</Text>
             </View>
             <View style={styles.iconEnd}>
                 <IconButton

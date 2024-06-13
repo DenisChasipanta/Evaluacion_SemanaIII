@@ -5,53 +5,48 @@ import { View } from 'react-native';
 import { push, ref, set } from 'firebase/database';
 import { auth, dbRealTime } from '../../../configs/firebaseConfig';
 
-//Interface - Props del componente: propiedades
+// Interface - Props del componente: propiedades
 interface Props {
     showModalMessage: boolean;
     setShowModalMessage: Function;
 }
 
-//Interface - Formulario mensaje
+// Interface - Formulario mensaje
 interface FormMessage {
-    to: string;
-    subject: string;
-    message: string;
+    email: string;
+    comentario: string;
 }
 
-export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: Props) => {
+export const NewPostsComponent = ({ showModalMessage, setShowModalMessage }: Props) => {
 
-    //hook useSate: manipulación de la data del formulario
+    // Hook useState: manipulación de la data del formulario
     const [formMessage, setFormMessage] = useState<FormMessage>({
-        to: '',
-        subject: '',
-        message: ''
+        email: auth.currentUser?.email || '',
+        comentario: ''
     });
 
     // Función que cambie los valores del formMessage
     const handlerSetValues = (key: string, value: string) => {
-        setFormMessage({ ...formMessage, [key]: value })
+        setFormMessage({ ...formMessage, [key]: value });
     }
 
-    //Función guardar el mensaje
+    // Función guardar el mensaje
     const handlerSaveMessage = async () => {
-        if (!formMessage.to || !formMessage.subject || !formMessage.message) {
+        if (!formMessage.comentario) {
             return;
         }
-        //console.log(formMessage);
-        // Guardar los datos en BDD
-        //1. Referencia a la BDD y creación tabla
-        const dbRef = ref(dbRealTime, 'messages/' + auth.currentUser?.uid);
-        //2. Crear una colección - evitando sobreescritura de la data
+        // Referencia a la BDD y creación tabla
+        const dbRef = ref(dbRealTime, 'comentarios/' + auth.currentUser?.uid);
+        // Crear una colección - evitando sobreescritura de la data
         const saveMessage = push(dbRef);
-        //3. Almacenar en la BDD
+        // Almacenar en la BDD
         try {
             await set(saveMessage, formMessage);
-            //4. Limpiar formulario
+            // Limpiar formulario
             setFormMessage({
-                to: '',
-                subject: '',
-                message: ''
-            })
+                email: auth.currentUser?.email || '',
+                comentario: ''
+            });
         } catch (ex) {
             console.log(ex);
         }
@@ -62,7 +57,7 @@ export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: P
         <Portal>
             <Modal visible={showModalMessage} contentContainerStyle={styles.modal}>
                 <View style={styles.header}>
-                    <Text variant='headlineMedium'>Nueva Mensaje</Text>
+                    <Text variant='headlineMedium'>Comentario</Text>
                     <View style={styles.iconEnd}>
                         <IconButton
                             icon='close-circle-outline'
@@ -73,21 +68,20 @@ export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: P
                 </View>
                 <Divider />
                 <TextInput
-                    label='Para'
+                    label='Correo Electrónico'
                     mode='outlined'
-                    onChangeText={(value) => handlerSetValues('to', value)} />
+                    value={formMessage.email}
+                    disabled={true}
+                />
                 <TextInput
-                    label='Asunto'
-                    mode='outlined'
-                    onChangeText={(value) => handlerSetValues('subject', value)} />
-                <TextInput
-                    label='Mensaje'
+                    label='comentario'
                     mode='outlined'
                     multiline={true}
                     numberOfLines={7}
-                    onChangeText={(value) => handlerSetValues('message', value)} />
+                    onChangeText={(value) => handlerSetValues('comentario', value)}
+                />
                 <Button mode='contained' onPress={handlerSaveMessage}>Enviar</Button>
             </Modal>
         </Portal>
-    )
+    );
 }
